@@ -22,6 +22,7 @@
 - (void)setTitleForStateSelectedFor:(UIButton *)button atIndex:(NSInteger)position;
 - (void)setTitleForStateDisabledFor:(UIButton *)button atIndex:(NSInteger)position;
 - (CGFloat)paddingForButton;
+- (CGFloat)heightForButton;
 @end
 
 @interface JLButtonScroller : NSObject {

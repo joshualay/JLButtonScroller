@@ -37,8 +37,12 @@
         NSString *text = [delegate stringForIndex:i];
         CGSize stringSize = [text sizeWithFont:font];
         CGFloat stringWidth = stringSize.width + buttonOffset;
+
+        CGFloat heightForButton = stringSize.height;
+        if ([delegate respondsToSelector:@selector(heightForButton)])
+            heightForButton = [delegate heightForButton];
         
-        button.frame = CGRectMake(xOffset, 0, stringWidth, stringSize.height);
+        button.frame = CGRectMake(xOffset, 0, stringWidth, heightForButton);
         
         [button setTitle:text forState:UIControlStateNormal];
         [button setTitle:text forState:UIControlStateHighlighted];
