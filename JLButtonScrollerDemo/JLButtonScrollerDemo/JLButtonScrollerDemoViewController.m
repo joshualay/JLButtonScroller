@@ -6,6 +6,8 @@
 //  Copyright 2011 Joshua Lay. All rights reserved.
 //
 
+#include <stdlib.h>
+
 #import "JLButtonScrollerDemoViewController.h"
 
 @interface JLButtonScrollerDemoViewController()
@@ -18,12 +20,14 @@
 @synthesize scrollView=_scrollView;
 @synthesize dataSource=_dataSource;
 @synthesize label=_label;
+@synthesize buttonScroller=_buttonScroller;
 
 - (void)dealloc
 {
     [_scrollView release];
     [_label release];
     [_dataSource release];
+    [_buttonScroller release];
     [super dealloc];
 }
 
@@ -38,18 +42,20 @@
     [super viewDidLoad];
     [self populateDataSource];
 
-    JLButtonScroller *buttonScrollWorker = [[JLButtonScroller alloc] init];
-    buttonScrollWorker.delegate = self;
+    self.buttonScroller = [[JLButtonScroller alloc] init];
+    self.buttonScroller.delegate = self;
     
-    [buttonScrollWorker addButtonsForContentAreaIn:self.scrollView];
+    [self.buttonScroller addButtonsForContentAreaIn:self.scrollView];
     
-    [buttonScrollWorker release];
+    [self.buttonScroller release];
+    
+    self.label.font = [UIFont systemFontOfSize:36.0f];
 }
 
 
 #pragma mark - ButtonScrollDelegate
 - (UIFont *)fontForButton {
-    return [UIFont systemFontOfSize:24.0f];
+    return [UIFont systemFontOfSize:17.0f];
 }
 
 - (NSInteger)numberOfButtons {
@@ -58,8 +64,12 @@
 
 - (UIButton *)buttonForIndex:(NSInteger)position {   
     UIButton *button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    button.titleLabel.textColor = [UIColor blackColor];
-    button.backgroundColor = [UIColor lightGrayColor];
+    
+    [button setTintColor:[UIColor lightTextColor]];
+    [button setTitleColor:[UIColor darkGrayColor] forState:UIControlStateHighlighted];
+    
+    [button setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
+    [button setTitleShadowColor:[UIColor whiteColor] forState:UIControlStateNormal];
     
     [button addTarget:self action:@selector(buttonReleased:) forControlEvents:UIControlEventTouchUpInside];
     
@@ -75,13 +85,31 @@
 }
 
 - (CGFloat)paddingForButton {
-    return 45.0f;
+    return 20.0f;
+}
+
+- (NSInteger)spaceBetweenButtons {
+    return 7;
 }
 
 #pragma mark - button selector
 -(void) buttonReleased:(id)sender {
     UIButton *button = (UIButton *)sender;
     self.label.text = button.titleLabel.text;
+}
+
+- (IBAction)reload:(id)sender {
+    self.dataSource = nil;
+    int range = arc4random_uniform(70);
+    NSMutableArray *randArray = [[NSMutableArray alloc] initWithCapacity:range];
+    for (int i = 0; i < range; i++) {
+        [randArray addObject:[NSString stringWithFormat:@"Num: %i", i]];
+    }
+    
+    self.dataSource = [randArray copy];
+    [randArray release];
+    
+    [self.buttonScroller reloadButtons];
 }
 
 @end

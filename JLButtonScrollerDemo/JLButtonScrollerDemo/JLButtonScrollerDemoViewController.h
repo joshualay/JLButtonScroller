@@ -14,8 +14,11 @@
     IBOutlet UILabel *label;
 }
 
+- (IBAction)reload:(id)sender;
+
 @property (nonatomic, retain) IBOutlet UIScrollView *scrollView;
 @property (nonatomic, retain) IBOutlet UILabel *label;
 @property (nonatomic, retain) NSArray *dataSource;
+@property (nonatomic, retain) JLButtonScroller *buttonScroller;
 
 @end

@@ -22,14 +22,17 @@
 - (void)setTitleForStateSelectedFor:(UIButton *)button atIndex:(NSInteger)position;
 - (void)setTitleForStateDisabledFor:(UIButton *)button atIndex:(NSInteger)position;
 - (CGFloat)paddingForButton;
+- (NSInteger)spaceBetweenButtons;
 @end
 
 @interface JLButtonScroller : NSObject {
     id <JLButtonScrollerDelegate> delegate;
+    UIScrollView *_scrollView;
 }
 
 @property (nonatomic, assign) id<JLButtonScrollerDelegate> delegate;
 
 - (void)addButtonsForContentAreaIn:(UIScrollView *)scrollView;
+- (void)reloadButtons;
 
 @end
