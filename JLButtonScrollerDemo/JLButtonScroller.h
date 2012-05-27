@@ -10,19 +10,33 @@
 
 @protocol JLButtonScrollerDelegate <NSObject>
 @required
-- (UIFont *)fontForButton;
-- (NSInteger)numberOfButtons;
-- (UIButton *)buttonForIndex:(NSInteger)position;
-- (NSString *)stringForIndex:(NSInteger)position;
-- (CGFloat)heightForScrollView;
+- (NSInteger)numberOfButtons; // How many buttons we're going to create
+- (UIButton *)buttonForIndex:(NSInteger)position; // The UIButton to put in place
 
 @optional
+/*
+ This will determine the text to display for the title in all states. 
+ 
+ The default is an empty string if you wish to only show images.
+ 
+ [button setTitle:text forState:UIControlStateNormal];
+ [button setTitle:text forState:UIControlStateHighlighted];
+ [button setTitle:text forState:UIControlStateSelected];
+ [button setTitle:text forState:UIControlStateDisabled];
+ */
+- (NSString *)stringButtonTitleForPosition:(NSInteger)position;
+
+- (CGFloat)heightForScrollView; // By default this will work out a height based on the size of the buttons
+- (CGFloat)heightForButton;
+- (UIFont *)fontForButton;
+
 - (void)setTitleForStateNormalFor:(UIButton *)button atIndex:(NSInteger)position;
 - (void)setTitleForStateHighlightedFor:(UIButton *)button atIndex:(NSInteger)position;
 - (void)setTitleForStateSelectedFor:(UIButton *)button atIndex:(NSInteger)position;
 - (void)setTitleForStateDisabledFor:(UIButton *)button atIndex:(NSInteger)position;
-- (CGFloat)paddingForButton;
-- (NSInteger)spaceBetweenButtons;
+
+- (CGFloat)paddingForButton; // How much extra space you want in a button besides the width of the string
+- (NSInteger)spaceBetweenButtons; // The gap between buttons
 @end
 
 @interface JLButtonScroller : NSObject {

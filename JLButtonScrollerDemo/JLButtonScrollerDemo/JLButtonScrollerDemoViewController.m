@@ -27,6 +27,7 @@
     [_scrollView release];
     [_label release];
     [_dataSource release];
+    _buttonScroller.delegate = nil;
     [_buttonScroller release];
     [super dealloc];
 }
@@ -42,12 +43,11 @@
     [super viewDidLoad];
     [self populateDataSource];
 
-    self.buttonScroller = [[JLButtonScroller alloc] init];
-    self.buttonScroller.delegate = self;
+    _buttonScroller = [[JLButtonScroller alloc] init];
     
-    [self.buttonScroller addButtonsForContentAreaIn:self.scrollView];
+    _buttonScroller.delegate = self;
     
-    [self.buttonScroller release];
+    [_buttonScroller addButtonsForContentAreaIn:self.scrollView];
     
     self.label.font = [UIFont systemFontOfSize:36.0f];
 }
@@ -76,7 +76,7 @@
     return button;
 }
 
-- (NSString *)stringForIndex:(NSInteger)position {
+- (NSString *)stringButtonTitleForPosition:(NSInteger)position {
     return [self.dataSource objectAtIndex:position];
 }
 
@@ -99,17 +99,22 @@
 }
 
 - (IBAction)reload:(id)sender {
-    self.dataSource = nil;
     int range = arc4random_uniform(70);
+    while (range == 0) {
+        range = arc4random_uniform(70);
+    }
+    
     NSMutableArray *randArray = [[NSMutableArray alloc] initWithCapacity:range];
     for (int i = 0; i < range; i++) {
         [randArray addObject:[NSString stringWithFormat:@"Num: %i", i]];
     }
-    
-    self.dataSource = [randArray copy];
+
+    _dataSource = nil;
+    _dataSource = [randArray copy];
+
     [randArray release];
     
-    [self.buttonScroller reloadButtons];
+    [_buttonScroller reloadButtons];
 }
 
 @end

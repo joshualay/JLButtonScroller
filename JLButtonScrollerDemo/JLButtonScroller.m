@@ -10,6 +10,9 @@
 
 @interface JLButtonScroller (Private)
 - (void)addButtonSubviewsForScrollView;
+
+- (NSString *)stringForIndex:(NSInteger)position;
+- (UIFont *)fontForButton;
 @end
 
 @implementation JLButtonScroller
@@ -40,7 +43,14 @@
 
 
 - (void)addButtonSubviewsForScrollView {
-    UIFont *font = [delegate fontForButton];
+    UIFont *font = [self fontForButton];
+    
+    /*  The button length is calculated using the string length below
+        This buffer is so the button isn't the length of the text
+        E.g. 
+            buttonOffset = 0 -    [buttontext]
+            buttonOffset = 8 - [   buttontext    ]
+     */
     
     NSInteger buttonOffset = 10.0f;
     if ([delegate respondsToSelector:@selector(paddingForButton)]) {
@@ -49,8 +59,8 @@
     
     NSInteger maxButtons = [delegate numberOfButtons];
     
-    NSInteger xOffset = 0;
-    NSInteger xButtonBuffer = 4.0f;
+    NSInteger xOffset = 0; // Work out where to place the next button
+    NSInteger xButtonBuffer = 4.0f; // Gap between buttons
     if ([delegate respondsToSelector:@selector(spaceBetweenButtons)]) {
         xButtonBuffer = [delegate spaceBetweenButtons];
     }
@@ -59,18 +69,32 @@
         UIButton *button = [delegate buttonForIndex:i];
         button.titleLabel.font = font;
         
-        NSString *text = [delegate stringForIndex:i];
+        NSString *text = [[self stringForIndex:i] copy];
         CGSize stringSize = [text sizeWithFont:font];
+        // Work out the width we need the button to be by determining how long the string is
         CGFloat stringWidth = stringSize.width + buttonOffset;
         
         CGRect scrollViewFrame = self->_scrollView.frame;
-        CGFloat scrollViewHeight = scrollViewFrame.size.height;
+        
         CGFloat buttonHeight = stringSize.height;
+        if ([self.delegate respondsToSelector:@selector(heightForButton)])
+            buttonHeight = [self.delegate heightForButton];
+        
+        CGFloat scrollViewHeight = scrollViewFrame.size.height;
+
+        // Don't want the button to go beyond the scroll view.
+        // If this is intentional then implement: heightForScrollView
+        if (buttonHeight > scrollViewHeight)
+            scrollViewHeight = buttonHeight;
+        
+        if ([self.delegate respondsToSelector:@selector(heightForScrollView)])
+            scrollViewHeight = [self.delegate heightForScrollView];
+        
         CGFloat diff = scrollViewHeight - buttonHeight;
         CGFloat yOffset = diff / 2.0f;
         yOffset += scrollViewFrame.origin.y;
         
-        button.frame = CGRectMake(xOffset, yOffset, stringWidth, stringSize.height);
+        button.frame = CGRectMake(xOffset, yOffset, stringWidth, buttonHeight);
         
         [button setTitle:text forState:UIControlStateNormal];
         [button setTitle:text forState:UIControlStateHighlighted];
@@ -92,11 +116,26 @@
             [delegate setTitleForStateDisabledFor:button atIndex:i];
         
         [self->_scrollView addSubview:button];
-            
-        xOffset += stringWidth + xButtonBuffer;
+        
+        xOffset += stringWidth + xButtonBuffer; // move our origin.x position for the next button
     }
     
     [self->_scrollView setContentSize:CGSizeMake(xOffset, [delegate heightForScrollView])];
 }
+
+- (UIFont *)fontForButton {
+    if ([self.delegate respondsToSelector:@selector(fontForButton)])
+        return [self.delegate fontForButton];
+    
+    return [UIFont systemFontOfSize:12.0f];
+}
+
+- (NSString *)stringForIndex:(NSInteger)position {
+    if ([self.delegate respondsToSelector:@selector(stringButtonTitleForPosition:)]) 
+        return [self.delegate stringButtonTitleForPosition:position];
+    
+    return @"";
+}
+
 
 @end
